@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='chat_style.css') }}">
+</head>
+<body>
+    <h1>Chatbot</h1>
+    <div id="chat"></div>
+    <form onsubmit="return sendReq()">
+        <input type="text" id="req" name="req">
+        <input type="submit" value="Send">
+    </form>
+    <script>
+        function sendReq() {
+            var req = document.getElementById("req").value;
+            var chat = document.getElementById("chat");
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+              if (xhr.readyState == 4 && xhr.status == 200) {
+                var res = xhr.responseText;
+                var user_input = document.createElement("p");
+                user_input.innerText = "User: " + req;
+                user_input.classList.add("user");
+                chat.appendChild(user_input);
+                var chatbot_output = document.createElement("p");
+                chatbot_output.innerText = "Chatbot: " + res;
+                chatbot_output.classList.add("chatbot");
+                chat.appendChild(chatbot_output);
+                chat.scrollTop = chat.scrollHeight; //자동스크롤
+              }
+            };
+            xhr.open("POST", "/chat", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.send("req=" + req);
+            document.getElementById("req").value = "";
+            return false;
+          }
+          
+    </script>
+</body>
+</html>

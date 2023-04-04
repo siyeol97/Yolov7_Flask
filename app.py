@@ -11,9 +11,11 @@ import csv
 import sqlite3
 import time
 import datetime
+from word.chatbot import Chatbot
 
 video = cv2.VideoCapture(0)
 app = Flask(__name__)
+chatbot = Chatbot()
 
 RESULT_FOLDER = os.path.join('static')
 app.config['RESULT_FOLDER'] = RESULT_FOLDER
@@ -123,6 +125,16 @@ def video_feed():
 @app.route("/webcam_feed")
 def webcam_feed():
     return render_template("streaming.html")
+
+@app.route('/chatting')
+def chatting():
+    return render_template('chatting.html')
+
+@app.route('/chat', methods=['POST'])
+def chat():
+    req = request.form['req']
+    res = chatbot.chat_rule(req)
+    return res
 
 
 if __name__ == "__main__":

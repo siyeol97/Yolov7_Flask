@@ -4,7 +4,7 @@ import pandas as pd
 class Chatbot():
     def __init__(self):
         self.chatbot_data = pd.read_excel(
-            "C:\preproj\Yolov7-Flask-main\word\chat_data.xlsx")
+            "./chatbot_data.xlsx")
         self.chat_dic = {}
         i = 0
         for rule in self.chatbot_data["rule"]:
