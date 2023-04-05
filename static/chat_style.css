@@ -1,9 +1,9 @@
 #chat {
     display: flex;
     flex-direction: column;
-    height: 500px;
+    height: 600px;
     overflow-y: auto;
-    max-width: 800px;
+    max-width: 550px;
     margin: auto;
     background-color: #fff;
     border-radius: 5px;
@@ -19,50 +19,56 @@
     max-width: 70%;
     white-space: pre-wrap;
     word-wrap: break-word;
-  }
-  
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+    }
+
   .user {
     align-self: flex-end;
     background-color: #ebebeb;
     color: #000;
     margin: 5px 10px;
-  }
-  
+    }
+
   .chatbot {
     align-self: flex-start;
-    background-color: #0084ff;
-    color: #fff;
+    background-color: #ffffff;
+    color: #000000;
     margin: 5px 10px;
-  }
-  
+    border: 1px solid #b2b2b2;
+    border-radius: 20px;
+    }
+
+  h1 {
+    text-align: center; 
+    margin-top: 50px;
+    }
+
   form {
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: row; /* 입력칸과 버튼을 가로로 배열 */
-    height: 80px;
+    flex-direction: row;
+    height: 150px;
     padding: 10px;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     background-color: #fff;
-    border-top: 1px solid #dbdbdb;
-  }
-  
+    }
+
   input[type="text"] {
-    display: flex;
-    max-width: 800px;
+    width: 500px;
     height: 20px;
     padding: 10px;
     border: 1px solid #dbdbdb;
     border-radius: 20px;
-    margin-right: 10px; /* 입력칸과 버튼 사이 간격 조정 */
+    margin-right: 5px;
     box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
     font-size: 16px;
     outline: none;
-  }
-  
+    } 
+
   button[type="submit"] {
     width: 60px;
     height: 40px;
@@ -74,9 +80,9 @@
     font-weight: bold;
     cursor: pointer;
     transition: all 0.2s ease;
-  }
+    margin-left: auto;
+    }
+    
   
-  button[type="submit"]:hover {
-    transform: scale(1.1);
-  }
+
   

@@ -21,26 +21,32 @@ RESULT_FOLDER = os.path.join('static')
 app.config['RESULT_FOLDER'] = RESULT_FOLDER
 
 # 모델찾는 함수, 디렉토리에 하나의 모델만
+
+
 def find_model():
     for f in os.listdir():
         if f.endswith(".pt"):
             return f
 
+
 # 모델 불러오기
 model_name = find_model()
 model = torch.hub.load('../yolov7', 'custom', model_name, source='local')
-model.eval() 
+model.eval()
 
 # sqlite db에 'test.db' 생성하고 연결
 conn = sqlite3.connect("test.db", isolation_level=None,
                        check_same_thread=False)
 curs = conn.cursor()
-curs.execute(# detected 라는 table이 없으면 생성
+curs.execute(  # detected 라는 table이 없으면 생성
     "CREATE TABLE IF NOT EXISTS detected (xmin, ymin, xmax, ymax, confidence, label TEXT, name TEXT, time)")
 
 # db저장 함수
+
+
 def save_to_db(to_db, time):
-    time_str = datetime.datetime.fromtimestamp(time).strftime('%Y-%m-%d %H:%M:%S') #시간데이터 yyyy-mm-dd hh-mm-ss 형태로
+    time_str = datetime.datetime.fromtimestamp(time).strftime(
+        '%Y-%m-%d %H:%M:%S')  # 시간데이터 yyyy-mm-dd hh-mm-ss 형태로
     # detected table에 저장
     curs.execute(
         "INSERT INTO detected (xmin, ymin, xmax, ymax, confidence, label, name, time) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
@@ -48,19 +54,21 @@ def save_to_db(to_db, time):
     conn.commit()
 
 # 실시간 웹캠 실행, 모델실행, 결과저장 함수
+
+
 def video_stream():
     prev_time = 0
-    FPS = 30 # 1초에 30번
-    db_save_interval = 0.5  # DB에 저장되는 간격을 설정 0.5초마다
+    FPS = 30  # 1초에 30번
+    db_save_interval = 1  # DB에 저장되는 간격을 설정 1초마다
     db_save_time = 0  # DB 저장시간 초기화
-    
+
     while True:
         ret, frame = video.read()
         if not ret:
             break
         else:
             current_time = time.time() - prev_time
-            if current_time > 1/FPS: # 1/30초마다 
+            if current_time > 1/FPS:  # 1/30초마다
                 results = model(frame)
                 annotated_frame = results.render()
 
@@ -71,11 +79,12 @@ def video_stream():
                 for i in range(len(df)):
                     to_db = df.iloc[i].tolist()
                     to_db[5] = to_db[5].astype('str')  # numpy array를 문자열로 변환
-
-                    # 현재 시간이 DB에 저장된 시간 + 저장 간격보다 큰 경우에만 DB에 저장
-                    if time.time() - db_save_time > db_save_interval: # 현재시간-db저장시간 > 0.5초
-                        save_to_db(to_db, time.time())  # 시간정보 추가
-                        db_save_time = time.time()  # 저장시간 업데이트
+                    if to_db[5] == '0':
+                        pass
+                    else:
+                        if time.time() - db_save_time > db_save_interval:
+                            save_to_db(to_db, time.time())
+                            db_save_time = time.time()  # 저장시간 업데이트
 
                 ret, buffer = cv2.imencode('.jpeg', frame)
                 frame = buffer.tobytes()
@@ -87,6 +96,8 @@ def video_stream():
     conn.close()
 
 # 이미지 분석
+
+
 def get_prediction(img_bytes):
     img = Image.open(io.BytesIO(img_bytes))
     imgs = [img]  # batched list of images
@@ -95,6 +106,8 @@ def get_prediction(img_bytes):
     return results
 
 # 메인화면
+
+
 @app.route('/', methods=['GET', 'POST'])
 def predict():
     if request.method == 'POST':
@@ -114,6 +127,8 @@ def predict():
     return render_template('index.html')
 
 # /webcam_feed 에서 실행됨 - streaming.html에서 실행됨
+
+
 @app.route("/video_feed")
 def video_feed():
     return Response(video_stream(),
@@ -122,13 +137,17 @@ def video_feed():
 # boundary : 각 응답들을 구분할 구분자를 설정하는 것
 
 # 웹캠버튼 누르면 streaming.html 실행
+
+
 @app.route("/webcam_feed")
 def webcam_feed():
     return render_template("streaming.html")
 
+
 @app.route('/chatting')
 def chatting():
     return render_template('chatting.html')
+
 
 @app.route('/chat', methods=['POST'])
 def chat():
