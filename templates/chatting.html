@@ -59,6 +59,17 @@
                                 chatbot_output2.classList.add("chatbot");
                                 chat.appendChild(chatbot_output2);
                                 
+                                for (var i = 0; i < data.length; i++) {
+                                    var item = data[i];
+                                    var label = item.label;
+                                    var time = item.time;
+                                    var chatbot_output_detected = document.createElement("p");
+                                    chatbot_output_detected.innerText = label + " " + time;
+                                    chatbot_output_detected.classList.add("detected");
+                                    chat.appendChild(chatbot_output_detected);
+                                    //console.log(chatbot_output_detected)
+                                }
+
                                 chat.scrollTop = chat.scrollHeight; //자동스크롤
                             }
                         };
