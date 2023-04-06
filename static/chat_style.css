@@ -40,7 +40,7 @@
 
   h1 {
     text-align: center; 
-    margin-top: 50px;
+    margin-top: 20px;
     }
 
   form {
@@ -74,15 +74,49 @@
     height: 40px;
     border: none;
     border-radius: 20px;
-    background-color: #0084ff;
+    background-color: #7b7c86;
     color: #fff;
     font-size: 16px;
-    font-weight: bold;
+    font-weight: normal;
     cursor: pointer;
     transition: all 0.2s ease;
     margin-left: auto;
     }
+
+    #topMenu {
+      height: 40px;
+      width: 800px;
+      margin: 20px auto;
+    }
     
-  
+    #topMenu ul {
+      display: flex;
+      justify-content: center;
+    }
+    
+    #topMenu ul li {
+      list-style-type: none;
+      color: black;
+      background-color: #d6d6d6;
+      line-height: 40px; /* 박스 높이 */
+      vertical-align: middle;
+      text-align: center;
+    }
+    
+    #topMenu .menuLink {
+      text-decoration: none;
+      color: rgb(0, 0, 0); 
+      display: block;
+      width: 150px; /* 박스 양옆 너비*/
+      font-size: 16px;
+      font-weight: normal;
+      font-family: "Trebuchet MS", Dotum, Arial;
+    }
+    
+    #topMenu .menuLink:hover {
+      color: red;
+      background-color: #4d4d4d;
+    }
+    
 
   

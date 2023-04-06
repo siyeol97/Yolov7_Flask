@@ -8,15 +8,23 @@
 </head>
 <body>
     <h1>Chatbot</h1>
-    <button type="button" onclick="location.href='/' ">Home</button>
+    <nav id="topMenu">
+        <ul>
+            <li><a class="menuLink" href="/">Home</a></li>
+            <li><a class="menuLink" href="/webcam_feed">webcam_feed</a></li>
+        </ul>
+    </nav>
+    
+    <!-- 채팅창 --> 
     <div id="chat"></div>
+    <!-- 채팅 입력칸 -->
     <form onsubmit="return sendReq()">
         <div class="input-wrapper">
             <input type="text" id="req" name="req">
             <button type="submit" value="Send">Send</button>
         </div>
     </form>
-
+    <!-- 채팅 입력 함수 -->
     <script>
         function sendReq() {
             var req = document.getElementById("req").value;
@@ -53,8 +61,9 @@
                         var chatbot_output2 = document.createElement("p");
                         xhr2.onreadystatechange = function() {
                             if (xhr2.readyState == 4 && xhr2.status == 200) {
-                                var data = JSON.parse(xhr2.responseText); // /get_data 엔드포인트에서 반환된 JSON 데이터 파싱
-                                console.log(data)
+                                // /get_data 엔드포인트에서 반환된 JSON 데이터 파싱
+                                var data = JSON.parse(xhr2.responseText); // data는 JSON 객체
+                                console.log(data) 
                                 chatbot_output2.innerText = res + "\n"; // 응답 메시지 출력
                                 chatbot_output2.classList.add("chatbot");
                                 chat.appendChild(chatbot_output2);
@@ -67,7 +76,6 @@
                                     chatbot_output_detected.innerText = label + " " + time;
                                     chatbot_output_detected.classList.add("detected");
                                     chat.appendChild(chatbot_output_detected);
-                                    //console.log(chatbot_output_detected)
                                 }
 
                                 chat.scrollTop = chat.scrollHeight; //자동스크롤
