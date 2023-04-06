@@ -156,5 +156,17 @@ def chat():
     return res
 
 
+@app.route('/get_data', methods=['GET'])
+def get_data():
+    conn = sqlite3.connect('test.db')
+    c = conn.cursor()
+    c.execute('SELECT label, time FROM detected')
+    rows = c.fetchall()
+    result = []
+    for row in rows:
+        result.append({'label': row[0], 'time': row[1]})
+    return json.dumps(result)
+
+
 if __name__ == "__main__":
     app.run(debug=True)
