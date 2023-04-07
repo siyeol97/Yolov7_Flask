@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<head>
+    <title>Detect Result Page</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='detectResult.css') }}">
+</head>
+<body>
+    <h1>Detection Result</h1>
+    <div style="text-align: right">
+        <button class="export-button" onclick="exportToCsv('detect_result.csv')">Export as CSV</button>
+    </div>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>name</th>
+                    <th>confidence</th>
+                    <th>time</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in range(detected.name|length) %}
+                    <tr>
+                        <td>{{ detected.name[i] }}</td>
+                        <td>{{ detected.confidence[i] }}</td>
+                        <td>{{ detected.time[i] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br>
+    
+    <script>
+        function exportToCsv(filename) {
+            var csv = 'name,confidence,time\n';
+            //Jinja2 문법. 오류가 있다고 뜨지만 실제로는 정상 작동됨.
+            {% for i in range(detected.name|length) %}
+                csv += '{{ detected.name[i] }},{{ detected.confidence[i] }},{{ detected.time[i] }}\n';
+            {% endfor %}
+
+            var csvData = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(csvData);
+            link.setAttribute('download', filename);
+            link.click();
+        }
+    </script>
+</body>
+</html>

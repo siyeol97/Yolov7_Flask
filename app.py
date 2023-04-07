@@ -21,8 +21,6 @@ RESULT_FOLDER = os.path.join('static')
 app.config['RESULT_FOLDER'] = RESULT_FOLDER
 
 # 모델찾는 함수, 디렉토리에 하나의 모델만
-
-
 def find_model():
     for f in os.listdir():
         if f.endswith(".pt"):
@@ -42,8 +40,6 @@ curs.execute(  # detected 라는 table이 없으면 생성
     "CREATE TABLE IF NOT EXISTS detected (xmin, ymin, xmax, ymax, confidence, label TEXT, name TEXT, time)")
 
 # db저장 함수
-
-
 def save_to_db(to_db, time):
     time_str = datetime.datetime.fromtimestamp(time).strftime(
         '%Y-%m-%d %H:%M:%S')  # 시간데이터 yyyy-mm-dd hh-mm-ss 형태로
@@ -54,8 +50,6 @@ def save_to_db(to_db, time):
     conn.commit()
 
 # 실시간 웹캠 실행, 모델실행, 결과저장 함수
-
-
 def video_stream():
     prev_time = 0
     FPS = 30  # 1초에 30번
@@ -96,18 +90,13 @@ def video_stream():
     conn.close()
 
 # 이미지 분석
-
-
 def get_prediction(img_bytes):
     img = Image.open(io.BytesIO(img_bytes))
     imgs = [img]  # batched list of images
-# Inference
     results = model(imgs, size=640)  # includes NMS
     return results
 
 # 메인화면
-
-
 @app.route('/', methods=['GET', 'POST'])
 def predict():
     if request.method == 'POST':
@@ -127,8 +116,6 @@ def predict():
     return render_template('index.html')
 
 # /webcam_feed 에서 실행됨 - streaming.html에서 실행됨
-
-
 @app.route("/video_feed")
 def video_feed():
     return Response(video_stream(),
@@ -137,36 +124,43 @@ def video_feed():
 # boundary : 각 응답들을 구분할 구분자를 설정하는 것
 
 # 웹캠버튼 누르면 streaming.html 실행
-
-
 @app.route("/webcam_feed")
 def webcam_feed():
     return render_template("streaming.html")
 
-
+# 챗봇 화면
 @app.route('/chatting')
 def chatting():
     return render_template('chatting.html')
 
-
+# 챗봇 동작
 @app.route('/chat', methods=['POST'])
 def chat():
     req = request.form['req']
     res = chatbot.chat_rule(req)
     return res
 
-
+# 챗봇에 요청하면, db에서 데이터 가져오는 부분
 @app.route('/get_data', methods=['GET'])
 def get_data():
     conn = sqlite3.connect('test.db')
     c = conn.cursor()
-    c.execute('SELECT label, time FROM detected')
+    c.execute('SELECT name, confidence, time FROM detected')
     rows = c.fetchall()
     result = []
     for row in rows:
-        result.append({'label': row[0], 'time': row[1]})
+        result.append({'name': row[0], 'confidence': row[1], 'time': row[2]})
     return json.dumps(result)
 
+# 챗봇에 요청하면, 데이터 띄워주는 부분
+@app.route('/detectResult', methods=['GET', 'POST'])
+def detect_result():
+    if request.method == 'POST':
+        global detected
+        detected = request.json
+        return render_template('detectResult.html', detected=detected)
+    else:
+        return render_template('detectResult.html', detected=detected)
 
 if __name__ == "__main__":
     app.run(debug=True)
