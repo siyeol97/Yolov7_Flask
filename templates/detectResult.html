@@ -7,6 +7,7 @@
     <h1>Detection Result</h1>
     <div style="text-align: right">
         <button class="export-button" onclick="exportToCsv('detect_result.csv')">Export as CSV</button>
+        <button class="export-button" onclick="goHome()">Home</button>
     </div>
     <div class="table-container">
         <table>
@@ -44,6 +45,9 @@
             link.setAttribute('download', filename);
             link.click();
         }
+        function goHome(){
+            window.location.href = "/";
+        }
     </script>
-</body>
+</body> 
 </html>
