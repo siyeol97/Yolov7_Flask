@@ -5,7 +5,7 @@ import json
 from PIL import Image
 import cv2
 import torch
-from flask import Flask, jsonify, url_for, render_template, request, redirect
+from flask import Flask, jsonify, url_for, render_template, request, redirect, session, flash
 from flask import Flask, render_template, Response, stream_with_context, Request
 import csv
 import sqlite3
@@ -97,8 +97,12 @@ def get_prediction(img_bytes):  # 이미지 분석
     return results
 
 
-@app.route('/', methods=['GET', 'POST'])  # 메인화면
+@app.route('/home', methods=['GET', 'POST'])  # 홈화면
 def predict():
+    if 'logFlag' not in session or not session['logFlag']:
+        flash('로그인이 필요합니다')
+        return redirect(url_for('login_form'))
+
     if request.method == 'POST':
         if 'file' not in request.files:
             return redirect(request.url)
@@ -163,5 +167,130 @@ def detect_result():
         return render_template('detectResult.html', detected=detected)
 
 
-if __name__ == "__main__":
-    app.run(debug=True)
+@app.route('/regist_user')  # 회원가입 페이지
+def regist_user():
+    return render_template('regist_user.html')
+
+
+@app.route('/regist_submit', methods=['POST'])  # 회원가입 버튼 누르면 실행되는 과정
+def submit():
+    username = request.form['username']
+    password = request.form['password']
+    email = request.form['email']
+    regist_time = datetime.datetime.fromtimestamp(
+        time.time()).strftime('%Y-%m-%d %H:%M:%S')
+
+    curs.execute(  # member 라는 table이 없으면 생성
+        "CREATE TABLE IF NOT EXISTS member (userID, userPWD, userEmail, registTime)")
+
+    # username이 입력되지 않았을 경우
+    if not username:
+        flash('아이디를 입력해 주세요.')
+        return redirect(url_for('regist_user'))
+
+    # id 중복검사
+    curs.execute("SELECT * FROM member WHERE userID=?", (username,))
+    user = curs.fetchone()
+    if user is not None:
+        flash('중복된 아이디입니다.')
+        return redirect(url_for('regist_user'))
+
+    # password가 입력되지 않았을 경우
+    if not password:
+        flash('비밀번호를 입력해 주세요.')
+        return redirect(url_for('regist_user'))
+
+    # email이 입력되지 않았을 경우
+    if not email:
+        flash('이메일을 입력해 주세요.')
+        return redirect(url_for('regist_user'))
+
+    curs.execute(  # member table에 저장
+        "INSERT INTO member (userID, userPWD, userEmail, registTime) VALUES (?, ?, ?, ?);",
+        (username, password, email, regist_time))
+    conn.commit()
+
+    flash('회원가입이 완료되었습니다.')
+    return redirect(url_for('login_form'))
+
+
+@app.route('/main')
+def main():
+    return render_template('main.html')
+
+
+@app.route('/')  # 로그인 페이지, 첫화면
+def login_form():
+    return render_template('login/login_form.html')
+
+
+@app.route('/login_proc', methods=['POST'])  # 로그인 버튼 누르면 실행되는 과정
+def login_proc():
+    if request.method == 'POST':
+        userId = request.form['id']
+        userPwd = request.form['pwd']
+        if len(userId) == 0 or len(userPwd) == 0:
+            flash('아이디를 입력해주세요')
+            return redirect(url_for('login_form'))
+        else:
+            conn = sqlite3.connect('test.db')
+            cursor = conn.cursor()
+            sql = 'select userID, userPWD, userEmail from member where userId = ?'
+            cursor.execute(sql, (userId, ))
+            rows = cursor.fetchall()
+            for rs in rows:
+                if userId == rs[0] and userPwd == rs[1]:
+                    session['logFlag'] = True
+                    session['userId'] = userId
+                    return redirect(url_for('predict'))
+
+            flash('로그인에 실패했습니다. 아이디 또는 비밀번호를 확인해주세요.')
+            return redirect(url_for('login_form'))  # 메소드를 호출
+    else:
+        return '잘못된 접근입니다.'
+
+
+@app.route('/user_info_edit/<userId>', methods=['GET'])  # 사용자 정보 수정 페이지
+def getUser(userId):
+    if session.get('logFlag') != True:
+        return redirect('login_form')
+
+    conn = sqlite3.connect('test.db')
+    cursor = conn.cursor()
+    sql = 'select userEmail from member where userId = ?'
+    cursor.execute(sql, (userId,))
+    row = cursor.fetchone()
+    edit_email = row[0]
+    cursor.close()
+    conn.close()
+    return render_template('users/user_info.html', userId=userId, edit_email=edit_email)
+
+
+# 사용자 정보 수정 버튼 누르면 실행되는 과정
+@app.route('/user_info_edit_proc', methods=['POST'])
+def user_info_edit_proc():
+    userId = request.form['userId']
+    userPwd = request.form['userPwd']
+    userEmail = request.form['userEmail']
+
+    conn = sqlite3.connect('test.db')
+    cursor = conn.cursor()
+    sql = 'update member set userPwd = ?, userEmail = ? where userId = ?'
+    cursor.execute(sql, (userPwd, userEmail, userId))
+    conn.commit()
+    cursor.close()
+    conn.close()
+    return redirect(url_for('predict'))
+
+
+@app.route('/logout')  # 로그아웃
+def logout():
+    session.clear()
+    flash('로그아웃 되었습니다.')
+    return redirect(url_for('login_form'))
+
+
+if __name__ == '__main__':
+    app.secret_key = '19970128'
+    app.debug = False
+    app.run(host='0.0.0.0', port=9900)
