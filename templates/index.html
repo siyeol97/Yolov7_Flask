@@ -16,6 +16,12 @@
         font-size: 3.5rem;
       }
     }
+    h2 {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
   </style>
   <link rel="stylesheet" href="/static/style.css">
   <title>Flask App using Yolov7 models</title>
@@ -23,7 +29,7 @@
 
 <body class="text-center">
 
-  <div class="loginfo" style="float: right; margin: 10px">
+  <div class="loginfo" style="float: right; margin: 20px;">
     {% if session.get('logFlag') %}
           userId : {{ session['userId'] }}
           | <a href="/user_info_edit/{{ session['userId'] }}">Edit</a>
@@ -46,7 +52,7 @@
     </button>
     <p class="mt-5 mb-3 text-muted">Yolov7</p>
   </form>
-
+  <h2>DEFECT DETECTION PROCESS</h2>
   <!-- 화면 중앙 위치 메뉴 버튼들 -->
   <div class="menu-wrapper" style="position: absolute; top: 0; left: 50%; transform: translateX(-50%);">
     <button class="btn btn-outline-secondary btn-sm mr-2" type="button" onclick="location.href='/webcam_feed' ">WebCam</button>

@@ -292,5 +292,6 @@ def logout():
 
 if __name__ == '__main__':
     app.secret_key = '19970128'
-    app.debug = False
-    app.run(host='0.0.0.0', port=9900)
+    app.debug = True
+    #app.run(host='0.0.0.0', port=9900)
+    app.run()

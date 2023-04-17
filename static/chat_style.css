@@ -85,8 +85,8 @@
 
     #topMenu {
       height: 40px;
-      width: 800px;
-      margin: 20px auto;
+      width: auto;
+      margin: 20px;
     }
     
     #topMenu ul {

@@ -4,15 +4,19 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='detectResult.css') }}">
 </head>
 <body>
-    <h1>Detection Result</h1>
-    <div style="text-align: right">
-        <button class="export-button" onclick="exportToCsv('detect_result.csv')">Export as CSV</button>
-        <button class="export-button" onclick="goHome()">Home</button>
+    <div class="container">
+        <h1>Detection Result</h1>
+        <div class='menu'>
+            <button class="export-button" onclick="exportToCsv('detect_result.csv')">Export as CSV</button>
+            <button class="export-button" onclick="goHome()">Home</button>
+        </div>
     </div>
+
     <div class="table-container">
         <table>
             <thead>
                 <tr>
+                    <th>index</th>
                     <th>name</th>
                     <th>confidence</th>
                     <th>time</th>
@@ -20,11 +24,12 @@
             </thead>
             <tbody>
                 {% for i in range(detected.name|length) %}
-                    <tr>
-                        <td>{{ detected.name[i] }}</td>
-                        <td>{{ detected.confidence[i] }}</td>
-                        <td>{{ detected.time[i] }}</td>
-                    </tr>
+                <tr>
+                    <td>{{i}}</td>
+                    <td>{{ detected.name[i] }}</td>
+                    <td>{{ detected.confidence[i] }}</td>
+                    <td>{{ detected.time[i] }}</td>
+                </tr>
                 {% endfor %}
             </tbody>
         </table>

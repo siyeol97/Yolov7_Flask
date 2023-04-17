@@ -1,6 +1,6 @@
 h1 {
     text-align: center;
-    margin-top: auto;
+    margin-top: 50px;
 }
 .table-container {
     display: flex;
@@ -36,4 +36,9 @@ tr:nth-child(even) {
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
+}
+.menu {
+    text-align: right;
+    margin: 20px;
+    left: auto;
 }
