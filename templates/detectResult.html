@@ -9,6 +9,7 @@
         <div class='menu'>
             <button class="export-button" onclick="exportToCsv('detect_result.csv')">Export as CSV</button>
             <button class="export-button" onclick="goHome()">Home</button>
+            <button class="export-button" onclick="goChart()">Chart</button>
         </div>
     </div>
 
@@ -27,7 +28,7 @@
                 <tr>
                     <td>{{i}}</td>
                     <td>{{ detected.name[i] }}</td>
-                    <td>{{ detected.confidence[i] }}</td>
+                    <td>{{ '%.3f' % (detected.confidence[i]*100) }}%</td>
                     <td>{{ detected.time[i] }}</td>
                 </tr>
                 {% endfor %}
@@ -52,6 +53,9 @@
         }
         function goHome(){
             window.location.href = "/home";
+        }
+        function goChart(){
+            window.location.href = "/chart";
         }
     </script>
 </body> 

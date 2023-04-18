@@ -38,6 +38,10 @@
     border-radius: 20px;
     }
 
+  .Menu-btn {
+    display: flex;
+  }
+
   h1 {
     text-align: center; 
     margin-top: 20px;
@@ -82,41 +86,5 @@
     transition: all 0.2s ease;
     margin-left: auto;
     }
-
-    #topMenu {
-      height: 40px;
-      width: auto;
-      margin: 20px;
-    }
-    
-    #topMenu ul {
-      display: flex;
-      justify-content: center;
-    }
-    
-    #topMenu ul li {
-      list-style-type: none;
-      color: black;
-      background-color: #d6d6d6;
-      line-height: 40px; /* 박스 높이 */
-      vertical-align: middle;
-      text-align: center;
-    }
-    
-    #topMenu .menuLink {
-      text-decoration: none;
-      color: rgb(0, 0, 0); 
-      display: block;
-      width: 150px; /* 박스 양옆 너비*/
-      font-size: 16px;
-      font-weight: normal;
-      font-family: "Trebuchet MS", Dotum, Arial;
-    }
-    
-    #topMenu .menuLink:hover {
-      color: red;
-      background-color: #4d4d4d;
-    }
-    
 
   

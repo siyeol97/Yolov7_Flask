@@ -8,12 +8,9 @@
 </head>
 <body>
     <h1>Chatbot</h1>
-    <nav id="topMenu">
-        <ul>
-            <li><a class="menuLink" href="/home">Home</a></li>
-            <li><a class="menuLink" href="/webcam_feed">webcam_feed</a></li>
-        </ul>
-    </nav>
+    <div class="menu-wrapper" style="position: absolute; top: 10; left: 20%; transform: translateX(-30%);">
+        <button class="btn btn-outline-secondary btn-sm mr-2" type="button" onclick="location.href='/home' ">Home</button>
+    </div>
     
     <!-- 채팅창 --> 
     <div id="chat"></div>

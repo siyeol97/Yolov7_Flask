@@ -142,6 +142,9 @@ def chatting():
 def chat():
     req = request.form['req']
     res = chatbot.chat_rule(req)
+    #conn = sqlite3.connect('test.db')
+    #cur = conn.cursor()
+
     return res
 
 
@@ -288,6 +291,40 @@ def logout():
     session.clear()
     flash('로그아웃 되었습니다.')
     return redirect(url_for('login_form'))
+
+
+@app.route('/chart')  # 최초 접속
+def chart():
+    conn = sqlite3.connect('test.db')
+    cur = conn.cursor()
+
+    # 각 불량 종류별로 발생 횟수를 계산
+    cur.execute("SELECT name, COUNT(*) FROM detected GROUP BY name")
+    rows = cur.fetchall()
+
+    # 도넛차트를 위한 데이터 생성
+    chart_data = []
+    for row in rows:
+        chart_data.append({'name': row[0], 'value': row[1]})
+
+    return render_template('chart.html', chart_data=chart_data)
+
+
+@app.route('/data')  # 1초마다 반영
+def data():
+    conn = sqlite3.connect('test.db')
+    cur = conn.cursor()
+
+    # 각 불량 종류별로 발생 횟수를 계산
+    cur.execute("SELECT name, COUNT(*) FROM detected GROUP BY name")
+    rows = cur.fetchall()
+
+    # 도넛차트를 위한 데이터 생성
+    chart_data = []
+    for row in rows:
+        chart_data.append({'name': row[0], 'value': row[1]})
+
+    return jsonify(chart_data)
 
 
 if __name__ == '__main__':
