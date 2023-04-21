@@ -29,7 +29,7 @@ class Chatbot():
                 return self.chatbot_data["response"][key]
 
         # 질문에 대한 rule이 없다면
-        return "무슨 말인지 잘 모르겠네요~"
+        return "죄송합니다. 답변할 수 없는 질문입니다. \n현재 불량률, 실시간 화면, 불량 상황과 같은 질문을 해주십시오."
 
     def chatting(self):
         while True:

@@ -7,7 +7,7 @@ function sendReq() {
         var res = xhr.responseText;	
 
         var user_input = document.createElement("p");
-        user_input.innerText = "User : " + req;
+        user_input.innerText = req;
         user_input.classList.add("user");
 
         // avatar 삽입
