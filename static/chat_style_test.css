@@ -1,0 +1,137 @@
+
+#chat {
+    display: flex;
+    flex-direction: column;
+    height: 600px; /* 스크롤을 적용할 높이 설정 */
+    overflow-y: auto; /* 스크롤 적용 */
+    max-width: 600px;
+    margin: auto; /* 가운데 정렬 */
+    border: 2px solid #dddddd93;
+    background-color: #ffffffc0;
+  }
+  
+.user,
+.chatbot {
+    display: inline-block;
+    margin: 5px 10px;
+    padding: 10px;
+    border-radius: 20px;
+    max-width: 60%;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    transition: background-color 0.2s ease-in-out;
+}
+  
+.user:hover,
+.chatbot:hover {
+    background-color: #ddd;
+}
+
+.top {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.menu-btn {
+    margin-bottom: 20px;
+    width: 60px;
+    height: 40px;
+    background-color: #7b7c86;
+    border: none;
+    color: #fff;
+    border-radius: 10px;
+    font-weight: normal;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 15px;
+  }
+
+.user {
+    align-self: flex-end;
+    background-color: #e6ecf0;
+    color: #1c1e21;
+    margin: 5px;
+}
+ 
+.user.avatar {
+    background-image: url("https://cdn-icons-png.flaticon.com/128/3095/3095045.png");
+    background-size: 65px;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px; /* 원하는 크기로 조정하세요 */
+    min-height: 45px;
+    object-fit: contain;
+    float: right;
+    margin: 5px;
+}
+  
+  
+.chatbot {
+    align-self: flex-start;
+    border: 2px solid #dddddd93;
+    background-color: #ffffff;
+    color: #000000;
+    margin: 5px;
+}
+  
+.chatbot.avatar {
+    background-image: url("https://cdn-icons-png.flaticon.com/512/4233/4233830.png");
+    background-size: 65px;
+    width: 50px; /* 원하는 크기로 조정하세요 */
+    height: 45px; /* 원하는 크기로 조정하세요 */
+    min-height: 45px;
+    border-radius: 50%; /* 원형 모양으로 만들어줍니다 */
+    object-fit: contain; /* 이미지가 영역을 채우도록 설정합니다 */
+    float: left;
+    margin: 5px;
+} 
+
+h1 {
+  text-align: center;
+  margin-top: 50px;
+  font-size: 3em;
+  color: #000b1bb4;
+  text-shadow: 2px 2px 2px #bbb;
+  letter-spacing: 2px;
+}
+
+form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 150px;
+}
+  
+input[type="text"] {
+    width: 100%;
+    max-width: 400px; /* 최대 너비 설정 */
+    padding: 10px;
+    border: none;
+    border-radius: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+}
+  
+button[type="submit"] {
+    margin-left: 10px;
+    padding: 10px 25px;
+    background-color: #000fe7;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    box-shadow: 2px 2px 4px #999;
+    font-family: 'Helvetica Neue', sans-serif;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+  
+  button[type="submit"]:hover {
+    background-color: #2e8b57;
+  }
