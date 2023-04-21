@@ -12,6 +12,9 @@ import sqlite3
 import time
 import datetime
 from word.chatbot import Chatbot
+from collections import defaultdict
+import torch.nn as nn
+from flask_sqlalchemy import SQLAlchemy
 
 video = cv2.VideoCapture(0)
 app = Flask(__name__)
@@ -28,7 +31,7 @@ def find_model():  # 모델찾는 함수, 디렉토리에 하나의 모델만
 
 
 model_name = find_model()  # 모델 불러오기
-model = torch.hub.load('../yolov7', 'custom',
+model = torch.hub.load('./yolov7', 'custom',
                        model_name, source='local')
 model.eval()
 
@@ -138,12 +141,27 @@ def chatting():
     return render_template('chatting.html')
 
 
+@app.route('/chatting_test')
+def chatting_test():
+    return render_template('chatting_test.html')
+
+
 @app.route('/chat', methods=['POST'])  # 챗봇 동작
 def chat():
     req = request.form['req']
     res = chatbot.chat_rule(req)
-    #conn = sqlite3.connect('test.db')
-    #cur = conn.cursor()
+
+    # 채팅 로그 db저장
+    conn = sqlite3.connect('test.db')
+    curs = conn.cursor()
+    curs.execute(  # chatlog 라는 table이 없으면 생성
+        "CREATE TABLE IF NOT EXISTS chatlog (chat TEXT, time)")
+    time_str = datetime.datetime.fromtimestamp(
+        time.time()).strftime('%Y-%m-%d %H:%M:%S')
+    curs.execute(
+        "INSERT INTO chatlog (chat, time) VALUES (?, ?);",
+        (req, time_str))
+    conn.commit()
 
     return res
 
@@ -293,7 +311,7 @@ def logout():
     return redirect(url_for('login_form'))
 
 
-@app.route('/chart')  # 최초 접속
+@app.route('/chart')  # 차트 최초 접속
 def chart():
     conn = sqlite3.connect('test.db')
     cur = conn.cursor()
@@ -307,11 +325,27 @@ def chart():
     for row in rows:
         chart_data.append({'name': row[0], 'value': row[1]})
 
-    return render_template('chart.html', chart_data=chart_data)
+    # 1시간 단위로 발생한 불량 건수 계산
+    cur.execute("SELECT time FROM detected ORDER BY time ASC")
+    rows = cur.fetchall()
+    hour_dict = defaultdict(int)
+    for row in rows:
+        time_str = row[0]
+        time_obj = datetime.datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+        hour = time_obj.replace(minute=0, second=0, microsecond=0)
+        hour_dict[hour] += 1
+
+    # 꺾은선 그래프를 위한 데이터 생성
+    line_data = []
+    for hour, count in hour_dict.items():
+        line_data.append({'time': hour.strftime(
+            '%Y-%m-%d %H:%M:%S'), 'count': count})
+
+    return render_template('chart.html', chart_data=chart_data, line_data=line_data)
 
 
-@app.route('/data')  # 1초마다 반영
-def data():
+@app.route('/data1')  # 1초마다 반영
+def data1():
     conn = sqlite3.connect('test.db')
     cur = conn.cursor()
 
@@ -325,6 +359,118 @@ def data():
         chart_data.append({'name': row[0], 'value': row[1]})
 
     return jsonify(chart_data)
+
+
+@app.route('/data2')  # 1초마다 반영
+def data2():
+    conn = sqlite3.connect('test.db')
+    cur = conn.cursor()
+
+    # 1시간 단위로 발생한 불량 건수 계산
+    cur.execute("SELECT time FROM detected ORDER BY time ASC")
+    rows = cur.fetchall()
+    hour_dict = defaultdict(int)
+    for row in rows:
+        time_str = row[0]
+        time_obj = datetime.datetime.strptime(time_str, '%Y-%m-%d %H:%M:%S')
+        hour = time_obj.replace(minute=0, second=0, microsecond=0)
+        hour_dict[hour] += 1
+
+    # 꺾은선 그래프를 위한 데이터 생성
+    line_data = []
+    for hour, count in hour_dict.items():
+        line_data.append({'time': hour.strftime(
+            '%Y-%m-%d %H:%M:%S'), 'count': count})
+
+    return jsonify(line_data)
+
+
+#######################################기계이상 탐지############################################
+RESULT_FOLDER = os.path.join('static')
+app.config['RESULT_FOLDER'] = RESULT_FOLDER
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///C:/pknu_web/sf5/sf5app/sf5_database.db'
+db = SQLAlchemy(app)
+
+
+# 기계이상 탐지
+class test(db.Model):
+    index = db.Column(db.Integer, primary_key=True)
+    sensor1 = db.Column(db.Integer)
+    sensor2 = db.Column(db.Integer)
+    sensor3 = db.Column(db.Integer)
+    sensor4 = db.Column(db.Integer)
+
+    def __init__(self, index=1, sensor1=None, sensor2=None, sensor3=None, sensor4=None):
+        self.index = index
+        self.sensor1 = sensor1
+        self.sensor2 = sensor2
+        self.sensor3 = sensor3
+        self.sensor4 = sensor4
+
+    def __repr__(self):
+        return '<%r, %r, %r, %r>' % (self.sensor1, self.sensor2, self.sensor3, self.sensor4)
+
+
+class KAMP_DNN(nn.Module):
+    # __init__(self): initialize; 내가 사용하고 싶은, 내 신경망 모델에 사용될 구성품들을 정의 및 초기화 하는 메소드
+    def __init__(self):
+        super(KAMP_DNN, self).__init__()
+        # nn.Linear(): 선형계층으로 weight와 bias을 사용하여 선형 변환을 적용하는 모듈
+        self.layer1 = nn.Linear(in_features=4, out_features=100)
+        self.layer2 = nn.Linear(in_features=100, out_features=100)
+        self.layer3 = nn.Linear(in_features=100, out_features=100)
+        self.layer4 = nn.Linear(in_features=100, out_features=4)
+
+        self.dropout = nn.Dropout(0.2)
+        self.relu = nn.ReLU()
+
+    def forward(self, input):
+        out = self.layer1(input)
+        out = self.relu(out)
+        out = self.dropout(out)
+
+        out = self.layer2(out)
+        out = self.relu(out)
+        out = self.dropout(out)
+
+        out = self.layer3(out)
+        out = self.relu(out)
+        out = self.dropout(out)
+
+        out = self.layer4(out)
+        return out
+
+
+def read_row():  # 머신러닝 위한 행 불러오기
+    conn = sqlite3.connect("my_database.db")
+    c = conn.cursor()
+    c.execute('SELECT * FROM test')
+    row = c.fetchone()  # 첫 번째 행을 읽어옴
+    conn.close()
+    ret = list(row[1:5])
+    return ret
+
+
+@app.route("/machpred")
+def machpred():
+    # 임시 데이터
+    file = torch.as_tensor([read_row()])
+
+    # 데이터 전처리
+
+    # 가중치 불러오기
+    model = torch.load('./model.pt')
+    model.eval()
+
+    # 예측
+    t_hat = model(file)
+    _, predicted = torch.max(t_hat.data, dim=1)
+
+    sort = ["정상상태", "질량불균형 고장상태", "지지불량 고장상태", "질량불균형과 지지불량 고장상태"]
+
+    result = sort[int(predicted)]
+
+    return (result)
 
 
 if __name__ == '__main__':
