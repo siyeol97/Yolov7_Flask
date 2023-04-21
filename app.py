@@ -385,7 +385,6 @@ def chart():
         [datetime.datetime.strptime(row[1], '%H:%M') for row in data_vi])
     time_labels = [dt.strftime('%H:%M:%S')
                    for dt in time_counts.keys()]
-    # time_labels, time_values = zip(*time_counts.items())
 
     cur.close()
     conn.close()
