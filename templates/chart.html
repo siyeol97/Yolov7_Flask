@@ -4,20 +4,45 @@
     <title>도넛차트 예제</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <style>
+        h1 {
+            display: flex;
+            justify-content: center;
+        }
+
+        .chartview {
+            display: flex;
+            justify-content: center;
+            align-items: center; /* 수직 중앙에 위치시킴 */
+            height: 80vh; /* 뷰포트 높이로 설정 */
+        }
+    </style>
+
 </head>
 <body>
-    <canvas id="chart" width="800" height="800"></canvas>
+    <h1>detection visualization</h1>
+
+    <div class="chartview">
+        <canvas id="chart" width="600" height="600"></canvas>
+        <canvas id="line-chart" width="600" height="600"></canvas>
+    </div>
+
+
+
 
     <script>
         var chart_data = {{ chart_data | tojson }};
+        var lineData = {{ line_data | tojson |safe }};
 
-        var ctx = document.getElementById('chart').getContext('2d');
-        var myChart = new Chart(ctx, {
+
+        var ctx1 = document.getElementById('chart').getContext('2d');
+        var myChart = new Chart(ctx1, {
             type: 'doughnut',
             data: {
-                labels: chart_data.map(function(d) { return d.name; }),
-                datasets: [{
-                    label: '',
+                labels: chart_data.map(function(d) { return d.name; }), //x축
+                datasets: [{ //y축
+                    label: 'Defect Count',
                     data: chart_data.map(function(d) { return d.value; }),
                     backgroundColor: [
                         'rgba(255, 99, 132, 0.5)',
@@ -46,20 +71,64 @@
                 }
             }
         });
+        console.log(myChart)
+
+        var ctx2 = document.getElementById('line-chart').getContext('2d');
+        var myLineChart = new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: lineData.map(function(d) { return d.time; }),
+                datasets: [{
+                    label: 'Defect Count',
+                    data: lineData.map(function(d) { return d.count; }),
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+        console.log(myLineChart)
 
         // 실시간 데이터 업데이트
         setInterval(function() {
+            // 도넛차트 데이터 업데이트
             $.ajax({
-                url: '/data',
+                url: '/data1',
                 type: 'GET',
                 dataType: 'json',
                 success: function(data) {
-                    // 가져온 데이터로 차트 업데이트
                     myChart.data.datasets[0].data = data.map(function(d) { return d.value; });
                     myChart.update();
                 }
             });
-        }, 1000);
+        
+            // 꺾은선 그래프 데이터 업데이트
+            $.ajax({
+                url: '/data2',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    myLineChart.data.datasets[0].data = data.map(function(d) { return d.count; });
+                    myLineChart.data.labels = data.map(function(d) { return d.time; });
+                    myLineChart.update();
+                }
+            });
+
+        }, 1000); // ms
+        
+
+
     </script>
 </body>
 </html>
