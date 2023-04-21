@@ -12,7 +12,7 @@ import sqlite3
 import time
 import datetime
 from word.chatbot import Chatbot
-from collections import defaultdict
+from collections import defaultdict, Counter
 import torch.nn as nn
 from flask_sqlalchemy import SQLAlchemy
 
@@ -188,6 +188,38 @@ def detect_result():
         return render_template('detectResult.html', detected=detected)
 
 
+@app.route('/load_percent')  # 불량률 계산
+def load_data():
+    conn = sqlite3.connect('test.db')
+    c = conn.cursor()
+    c.execute("SELECT time FROM detected")
+    rows = c.fetchall()
+    conn.close()
+
+    data = []
+    for row in rows:
+        label = row[0].strip()
+
+        data.append(datetime.datetime.strptime(label, '%Y-%m-%d %H:%M:%S'))
+
+    # 공장 가동 시작 시각 - 현재 시각
+    now = datetime.datetime.now()
+    nine_am = datetime.datetime.strptime(
+        str(now.date()), '%Y-%m-%d').replace(hour=9)
+    # target_time = datetime.datetime.combine(now.date(), nine_am)
+
+    time_diff = (now - nine_am).total_seconds()
+
+    now_date = datetime.datetime.now().date()
+    defect_count = sum(1 for item in data if item.date() == now_date)
+
+    percent = float(defect_count / time_diff)
+
+    time = datetime.datetime.now().strftime('%H:%M:%S')
+
+    return jsonify({"nine_am": nine_am, "percent": percent, "time": time, "defect_count": defect_count})
+
+
 @app.route('/regist_user')  # 회원가입 페이지
 def regist_user():
     return render_template('regist_user.html')
@@ -341,7 +373,26 @@ def chart():
         line_data.append({'time': hour.strftime(
             '%Y-%m-%d %H:%M:%S'), 'count': count})
 
-    return render_template('chart.html', chart_data=chart_data, line_data=line_data)
+    # 진동데이터
+    conn_vi = sqlite3.connect("_database.db")
+    c_vi = conn_vi.cursor()
+    c_vi.execute('SELECT sensor2, timepoint FROM test WHERE ROWID % 60 = 1')
+    data_vi = c_vi.fetchall()
+
+    # 데이터 가공
+    values = list(row[0] for row in data_vi)
+    time_counts = Counter(
+        [datetime.datetime.strptime(row[1], '%H:%M') for row in data_vi])
+    time_labels = [dt.strftime('%H:%M:%S')
+                   for dt in time_counts.keys()]
+    # time_labels, time_values = zip(*time_counts.items())
+
+    cur.close()
+    conn.close()
+    c_vi.close()
+    conn_vi.close()
+
+    return render_template('chart.html', chart_data=chart_data, line_data=line_data, time_labels=time_labels, time_values=values)
 
 
 @app.route('/data1')  # 1초마다 반영

@@ -37,7 +37,7 @@ function sendReq() {
           chat.scrollTop = chat.scrollHeight; //자동스크롤
         }
 
-        else if(res == '불량률'){
+        else if(res == '불량상황'){
             console.log('불량률 알림 실행')
             var xhr2 = new XMLHttpRequest(); // /get_data 엔드포인트로 요청을 보내기 위한 XMLHttpRequest 객체 생성
             var chatbot_output_detected = document.createElement("p");
@@ -51,7 +51,7 @@ function sendReq() {
                     // /get_data 엔드포인트에서 반환된 JSON 데이터 파싱
                     var data = JSON.parse(xhr2.responseText); // data는 JSON 객체 
                     chat.appendChild(chatbot_avatar);
-                    chatbot_output2.innerText = "현재 시각 : " + currentTimeString + "\n기준 불량률 입니다." + "\n"; // 응답 메시지 출력
+                    chatbot_output2.innerText = "현재 시각 : " + currentTimeString + "\n기준 탐지 결과입니다." + "\n"; // 응답 메시지 출력
                     chatbot_output2.classList.add("chatbot");
                     chat.appendChild(chatbot_output2);
                     const detect = {'name' : [], 'confidence' : [], 'time' : []};
@@ -86,6 +86,26 @@ function sendReq() {
             }
             xhr2.open("GET", "/get_data", true); // /get_data 엔드포인트로 GET 요청 전송
             xhr2.send();
+        }
+
+        else if(res === '불량률') {
+          var xhr4 = new XMLHttpRequest();
+          xhr4.onreadystatechange = function() {
+            if (xhr4.readyState === 4 && xhr4.status === 200) {
+              var data = JSON.parse(xhr4.responseText);
+              console.log(data)
+              
+              var message = "현재시간 : " + data.time + "\n기준 현재 불량률은 " + (data.percent * 100).toFixed(3) + "%" + "입니다.";
+              chatbot_output.innerText = message;
+              chatbot_output.classList.add("chatbot");
+              chat.appendChild(chatbot_avatar);
+              chat.appendChild(chatbot_output);
+              chat.scrollTop = chat.scrollHeight; //자동스크롤
+            }
+          };
+          xhr4.open("GET", "/load_percent", true);
+          xhr4.send();
+
         }
         
         else if (res === '기계이상') {

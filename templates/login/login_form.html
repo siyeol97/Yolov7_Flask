@@ -7,6 +7,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
 
     <style>
+        body {
+            background-image: url('https://www.hyundai.co.kr/image/upload/asset_library/MDA00000000000013038/d39e2a39f19e46c69ca4d63a187afc74.jpg');
+            background-repeat: no-repeat;
+            background-size: cover;
+            opacity: 1;
+        }
+        
         .container {
             display: flex;
             flex-direction: column;
@@ -42,8 +49,10 @@
             justify-content: center;
             align-items: center;
         }
-        h2 {
+        h1 {
             margin-bottom: 50px;
+            font-size: 3em;
+            font-weight: bolder;
         }
     </style>
 </head>
@@ -63,7 +72,7 @@
 
     <!-- 로그인폼 -->
     <div class="container">
-        <h2>DEFECT DETECTION LOGIN</h2>
+        <h1>DEFECT DETECTION LOGIN</h1>
         <form action="/login_proc" method="post">
             <div class="form-floating mb-3">
                 <input type="text" class="form-control" id="floatingInput" placeholder="ID" name="id">
