@@ -6,6 +6,23 @@
   <link rel="stylesheet" href="//stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
     integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
   <style>
+    html {
+      background: url('https://www.hyundai.co.kr/image/upload/asset_library/MDA00000000000013038/d39e2a39f19e46c69ca4d63a187afc74.jpg') no-repeat center fixed;
+      background-size: cover;
+    }
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.77);
+      z-index: -1;
+    }
+    body {
+      background-color: rgba(255, 255, 255, 0); /* 부트스트랩에서 적용된 흰바탕 투명하게*/
+    }
+
     .bd-placeholder-img {
       font-size: 1.125rem;
       text-anchor: middle;
@@ -22,13 +39,19 @@
       left: 50%;
       transform: translateX(-50%);
     }
+    .btn {
+      background-color: #fff0 !important;
+    }
+    .btn::after {
+      background-color: #fff0 !important;
+    }
   </style>
   <link rel="stylesheet" href="/static/style.css">
   <title>Flask App using Yolov7 models</title>
 </head>
 
 <body class="text-center">
-
+  <div class="overlay"></div>
   <div class="loginfo" style="float: right; margin: 20px;">
     {% if session.get('logFlag') %}
           userId : {{ session['userId'] }}
@@ -55,8 +78,8 @@
   <h2>DEFECT DETECTION PROCESS</h2>
   <!-- 화면 중앙 위치 메뉴 버튼들 -->
   <div class="menu-wrapper" style="position: absolute; top: 0; left: 50%; transform: translateX(-50%);">
-    <button class="btn btn-outline-secondary btn-sm mr-2" type="button" onclick="location.href='/webcam_feed' ">WebCam</button>
-    <button class="btn btn-outline-secondary btn-sm" type="button" onclick="location.href='/chatting_test' ">Chatbot</button>
+    <button class="my-btn btn btn-outline-secondary btn-sm mr-2" type="button" onclick="location.href='/webcam_feed' ">WebCam</button>
+    <button class="my-btn btn btn-outline-secondary btn-sm" type="button" onclick="location.href='/chatting_test' ">Chatbot</button>
   </div>
 
 

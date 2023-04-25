@@ -6,8 +6,7 @@ from PIL import Image
 import cv2
 import torch
 from flask import Flask, jsonify, url_for, render_template, request, redirect, session, flash
-from flask import Flask, render_template, Response, stream_with_context, Request
-import csv
+from flask import Flask, render_template, Response
 import sqlite3
 import time
 import datetime
@@ -15,6 +14,8 @@ from word.chatbot import Chatbot
 from collections import defaultdict, Counter
 import torch.nn as nn
 from flask_sqlalchemy import SQLAlchemy
+import sys
+
 
 video = cv2.VideoCapture(0)
 app = Flask(__name__)
@@ -23,18 +24,7 @@ chatbot = Chatbot()
 RESULT_FOLDER = os.path.join('static')
 app.config['RESULT_FOLDER'] = RESULT_FOLDER
 
-
-def find_model():  # 모델찾는 함수, 디렉토리에 하나의 모델만
-    for f in os.listdir():
-        if f.endswith(".pt"):
-            return f
-
-
-model_name = find_model()  # 모델 불러오기
-model = torch.hub.load('./yolov7', 'custom',
-                       model_name, source='local')
-model.eval()
-
+model = torch.hub.load('WongKinYiu/yolov7', 'custom', 'best.pt') # 커스텀 모델 불러오기
 
 conn = sqlite3.connect("test.db", isolation_level=None,
                        check_same_thread=False)  # sqlite db에 'test.db' 생성하고 연결
@@ -111,7 +101,7 @@ def predict():
             return redirect(request.url)
         file = request.files.get('file')
         if not file:
-            return
+            return render_template('index.html')
 
         img_bytes = file.read()
         results = get_prediction(img_bytes)

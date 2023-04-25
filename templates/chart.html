@@ -64,16 +64,31 @@
             options: {
                 responsive: false,
                 maintainAspectRatio: false,
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                        padding: {
+                            top: 10,
+                            bottom: 30
                         }
-                    }]
-                }
-            }
+                    },
+                    title: {
+                        display: true,
+                        text: '불량 종류별 탐지',
+                        position: 'top',
+                        font: {
+                            size: 20
+                        },
+                        padding: {
+                            top: 10,
+                            bottom: 30
+                        }
+                    },          
+                },
+            },         
         });
-        console.log(myChart)
+        console.log(myChart);
 
         var ctx2 = document.getElementById('line-chart').getContext('2d');
         var myLineChart = new Chart(ctx2, {
@@ -97,6 +112,29 @@
                             beginAtZero: true
                         }
                     }]
+                },
+                plugins: {
+                    legend: {
+                       display: true,
+                       position: 'top',
+                       align: 'end',
+                       padding: {
+                        top: 10,
+                        bottom: 30
+                       }
+                    },
+                    title: {
+                        display: true,
+                        text: '시간대별 불량 탐지',
+                        position: 'top',
+                        font: {
+                            size: 20
+                          },
+                        padding: {
+                            top: 10,
+                            bottom: 30
+                           }
+                    }
                 }
             }
         });
@@ -159,13 +197,28 @@
                         }
                     }]
                 },
-                title: {
-                    display: true,
-                    text : '진동 데이터',
-                    fontSize: 16, // 제목 폰트 크기 조정
-                    fontColor: 'black', // 제목 폰트 색상 조정
-                    position: 'top', // 제목 위치 지정
-                    padding: 20 // 제목과 차트 사이 간격 조정
+                plugins: {
+                    legend: {
+                       display: true,
+                       position: 'top',
+                       align: 'end',
+                       padding: {
+                        top: 10,
+                        bottom: 30
+                       }
+                    },
+                    title: {
+                        display: true,
+                        text: '진동 데이터',
+                        position: 'top',
+                        font: {
+                            size: 20
+                          },
+                        padding: {
+                            top: 10,
+                            bottom: 30
+                           }
+                    }
                 }
             }
         });
